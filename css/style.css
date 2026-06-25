@@ -66,7 +66,7 @@ h1, h2, h3, h4 {
 .section-head { max-width: 640px; margin-bottom: 64px; }
 .section-head h2 { font-size: clamp(32px, 4vw, 44px); margin-top: 16px; }
 .section-head p { color: var(--gray); margin-top: 16px; font-size: 17px; }
-.section-head.center { margin-inline: auto; text-align: center; }
+.section-head.revealCenter.textCenter { margin-inline: auto; text-align: center; }
 .section-top-row { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 64px; }
 .section-top-row .section-head { margin-bottom: 0; }
 
@@ -80,7 +80,6 @@ h1, h2, h3, h4 {
   font-size: 15px;
   font-weight: 600;
   transition: all 0.35s var(--ease);
-  white-space: nowrap;
 }
 .btn-primary { background: linear-gradient(135deg, var(--gold-light), var(--gold)); color: #1a1300; }
 .btn-primary:hover { box-shadow: var(--shadow-gold); transform: translateY(-2px); }
@@ -91,13 +90,13 @@ h1, h2, h3, h4 {
 
 /* ---- Navbar ---- */
 .navbar {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  z-index: 100; position: absolute;
   padding: 22px 0; transition: all 0.4s var(--ease);
-  border-bottom: 1px solid transparent;
+  border-bottom: 1px solid transparent; width: 100%;
+  background: transparent;
 }
 .navbar.scrolled {
   padding: 16px 0;
-  background: rgba(7, 7, 10, 0.85);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--line);
 }
@@ -127,9 +126,9 @@ h1, h2, h3, h4 {
 .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 .mobile-nav {
-  position: fixed; inset: 0; background: var(--black); z-index: 99;
+  position: absolute; inset: 0; background: var(--black); z-index: 99;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px;
-  transform: translateY(-100%); transition: transform 0.5s var(--ease);
+  transform: translateY(-100%); transition: transform 0.5s var(--ease); width: 100%; height: 100vh;
 }
 .mobile-nav.open { transform: translateY(0); }
 .mobile-nav a { font-size: 24px; font-family: 'Sora', sans-serif; }
@@ -172,22 +171,35 @@ h1, h2, h3, h4 {
 
 /* ---- Event Cards ---- */
 .events-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-.event-card { border: 1px solid var(--line); border-radius: 18px; overflow: hidden; transition: all 0.4s var(--ease); background: var(--charcoal); }
+.event-card { border: 1px solid var(--line); border-radius: 18px; overflow: hidden; transition: all 0.4s var(--ease); background: var(--charcoal); position: relative; /* important for relative layering */ }
 .event-card:hover { transform: translateY(-6px); border-color: var(--line-strong); box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
-.event-thumb { height: 200px; position: relative; display: flex; align-items: flex-end; justify-content: flex-end; padding: 18px; }
-.thumb-esports { background: linear-gradient(135deg, #1a1f2e, #243049); }
-.thumb-concert { background: linear-gradient(135deg, #241a2e, #3a2440); }
-.thumb-hackathon { background: linear-gradient(135deg, #1a2420, #243a30); }
+
+/* Updated positioning for full-div image backgrounds */
+.event-thumb { height: 200px; position: relative; display: flex; align-items: flex-end; justify-content: flex-end; padding: 18px; border-radius: 10px; overflow: hidden; }
+.event-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: -2; /* placed behind everything, including gradients */ }
+
+/* Remove explicit conflicting background colors */
+.thumb-esports, .thumb-concert, .thumb-hackathon { background: transparent; }
+
+/* Blended gradients applied *over* the image for readability, using different blending methods for a premium feel. We apply them with pseudo-elements to keep the specific class control. */
+.thumb-esports::after, .thumb-concert::after, .thumb-hackathon::after { content: ''; position: absolute; inset: 0; z-index: -1; /* blend mode and lighter gradient for a subtle effect over the image */ opacity: 0.6; mix-blend-mode: color-burn; }
+
+.thumb-esports::after { background: linear-gradient(135deg, #1a1f2e, #243049); }
+.thumb-concert::after { background: linear-gradient(135deg, #241a2e, #3a2440); }
+.thumb-hackathon::after { background: linear-gradient(135deg, #1a2420, #243a30); }
+
+/* Ensure items on top are visible and layered correctly */
 .event-thumb .tag {
   position: absolute; top: 18px; left: 18px;
   font-size: 11.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
   background: rgba(7,7,10,0.6); backdrop-filter: blur(6px);
   padding: 6px 12px; border-radius: 100px; color: var(--gold-light);
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--line-strong); z-index: 1; /* z-index and position are explicit */
 }
-.date-badge { background: var(--white); color: var(--black); border-radius: 10px; padding: 8px 12px; text-align: center; line-height: 1.1; }
+.date-badge { background: var(--white); color: var(--black); border-radius: 10px; padding: 8px 12px; text-align: center; line-height: 1.1; z-index: 1; /* z-index and position are explicit */ }
 .date-badge .day { font-size: 18px; font-weight: 700; display: block; }
 .date-badge .mon { font-size: 11px; text-transform: uppercase; color: var(--gray-dim); }
+
 .event-body { padding: 24px; }
 .event-body h4 { font-size: 18px; margin-bottom: 10px; }
 .event-meta { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: var(--gray); margin-bottom: 16px; }
